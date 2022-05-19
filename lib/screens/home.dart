@@ -26,19 +26,15 @@ class _MyHomePageState extends State<MyHomePage> {
         print("Error: App location permission denied forever");
       }
       var location = await Geolocator.getCurrentPosition();
-      print(location.accuracy);
+      // print(location.accuracy);
 
       setState(() {
         lat = location.latitude;
         lng = location.longitude;
       });
-      print(lat);
-      print(lng);
     } else {
       print("Error : GPS sensor permission issue, device level");
     }
-
-    final LatLng _center = LatLng(lat, lng);
   }
 
   @override
@@ -47,9 +43,9 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
 
-  late CameraPosition initialPoint = CameraPosition(
+  late CameraPosition initialPoint = const CameraPosition(
       target: LatLng(34.47554013447298, -100.6012667768258),
       tilt: 59.440717697143555,
       zoom: 3);
@@ -61,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Google Maps'),
+        title: const Text('Google Maps'),
         centerTitle: true,
       ),
       body: GoogleMap(
@@ -74,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _goToMyLocation,
         label: const Text("my location"),
-        icon: Icon(Icons.my_location),
+        icon: const Icon(Icons.my_location),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
