@@ -14,7 +14,19 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   double lat = 0.0;
   double lng = 0.0;
+  //GOOGLE ANIMATION CONTROLLER
+  final Completer<GoogleMapController> _controller = Completer();
+  //GOOGLE MARK CONTROLLER
+  final Completer<GoogleMapController> controller = Completer();
+  final Set<Marker> _markers = {};
 
+  //GOOGLE MAP INIT POSITION
+  late CameraPosition initialPoint = const CameraPosition(
+      target: LatLng(34.47554013447298, -100.6012667768258),
+      tilt: 59.440717697143555,
+      zoom: 3);
+
+  // TODO FIND LAT AND LNG
   findMyLocation() async {
     bool devicePermission;
     devicePermission = await Geolocator.isLocationServiceEnabled();
@@ -37,47 +49,50 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  //TODO CREATE THE MARK ON THE MAP
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      _markers
+          .add(Marker(markerId: MarkerId('id-1'), position: LatLng(lat, lng)));
+    });
+  }
+
+  //TODO GO TO MY POSITION GOOGLE MAPS
+  Future<void> _goToMyLocation() async {
+    late CameraPosition mylocation = CameraPosition(
+        target: LatLng(lat, lng), tilt: 59.440717697143555, zoom: 20);
+    final GoogleMapController controller = await _controller.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(mylocation));
+    _onMapCreated(controller);
+  }
+
   @override
   initState() {
     findMyLocation();
     super.initState();
   }
 
-  final Completer<GoogleMapController> _controller = Completer();
-
-  late CameraPosition initialPoint = const CameraPosition(
-      target: LatLng(34.47554013447298, -100.6012667768258),
-      tilt: 59.440717697143555,
-      zoom: 3);
-
-  late CameraPosition mylocation = CameraPosition(
-      target: LatLng(lat, lng), tilt: 59.440717697143555, zoom: 20);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Google Maps'),
-        centerTitle: true,
       ),
       body: GoogleMap(
         mapType: MapType.normal,
+        markers: _markers,
         initialCameraPosition: initialPoint,
         onMapCreated: (GoogleMapController controller) {
           _controller.complete(controller);
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.blueAccent,
         onPressed: _goToMyLocation,
-        label: const Text("my location"),
-        icon: const Icon(Icons.my_location),
+        child: const Icon(Icons.my_location),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
-  }
-
-  Future<void> _goToMyLocation() async {
-    final GoogleMapController controller = await _controller.future;
-    controller.animateCamera(CameraUpdate.newCameraPosition(mylocation));
   }
 }
